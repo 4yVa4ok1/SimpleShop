@@ -1,0 +1,13 @@
+﻿namespace SimpleShop.Models
+{
+	public class PurchaseProduct
+	{
+		public int ProductId { get; set; }
+		public Product Product { get; set; }
+
+		public int PurchaseId { get; set; }
+		public Purchase Purchase { get; set; }
+
+		public int Count { get; set; }
+	}
+}

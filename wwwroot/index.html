@@ -1,0 +1,229 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width" />
+	<title>Покупки</title>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.0/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+	<h2>Покупки</h2>
+	<table id="purchases" class="table table-condensed table-striped col-md-6">
+		<thead><tr><th>Id</th><th>Дата</th><th>Сумма</th><th>Клиент</th></tr></thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<h2>Клиенты</h2>
+	<table id="clients" class="table table-condensed table-striped col-md-6">
+		<thead><tr><th>Id</th><th>Имя</th><th>Фамилия</th><th>Дата рождения</th><th>Дата регистрации</th><th>Дата последней покупки</th></tr></thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<h2>Сегодня празднуют именины</h2>
+	<table id="birthdays" class="table table-condensed table-striped col-md-6">
+		<thead><tr><th>Id</th><th>Имя</th><th>Фамилия</th></tr></thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<h2>Последние покупатели со вчера</h2>
+	<table id="lastClients" class="table table-condensed table-striped col-md-6">
+		<thead><tr><th>Id</th><th>Имя</th><th>Фамилия</th><th>Дата последней покупки</th></tr></thead>
+		<tbody>
+		</tbody>
+	</table>
+
+	<h2>Востребованные категории клиента Evgeniy Yakush</h2>
+	<table id="requiredCategories" class="table table-condensed table-striped col-md-6">
+		<thead><tr><th>Название</th><th>Количество</th></tr></thead>
+		<tbody>
+		</tbody>
+	</table>
+	<script>
+		(async function GetPurchases() {
+			const response = await fetch("/api/purchases", { method: "GET", headers: { "Accept": "application/json" } });
+			if (response.ok === true) {
+				const purchases = await response.json();
+				let rows = document.getElementById("purchases");
+				purchases.forEach(purchase => {
+					rows.append(purchaseRow(purchase));
+				});
+			}
+		})();
+
+		(async function GetClients() {
+			const response = await fetch("/api/clients", { method: "GET", headers: { "Accept": "application/json" } });
+			if (response.ok === true) {
+				const clients = await response.json();
+				let rows = document.getElementById("clients");
+				clients.forEach(client => {
+					rows.append(clientRow(client));
+				});
+			}
+		})();
+
+		(async function GetBirthdays() {
+			const response = await fetch("/api/clients/GetByBirthday", { method: "GET", headers: { "Accept": "application/json" } });
+			if (response.ok === true) {
+				const birthdays = await response.json();
+				let rows = document.getElementById("birthdays");
+				birthdays.forEach(birthday => {
+					rows.append(birthdayRow(birthday));
+				});
+			}
+		})();
+
+		(async function GetLastClients() {
+			const response = await fetch("/api/clients/GetLastCustomers/1", { method: "GET", headers: { "Accept": "application/json" } });
+			if (response.ok === true) {
+				const lastClients = await response.json();
+				let rows = document.getElementById("lastClients");
+				lastClients.forEach(client => {
+					rows.append(lastClientRow(client));
+				});
+			}
+		})();
+
+		(async function GetRequiredCategories() {
+			const response = await fetch("/api/productCategories/GetByClient/2", { method: "GET", headers: { "Accept": "application/json" } });
+			if (response.ok === true) {
+				const categories = await response.json();
+				let rows = document.getElementById("requiredCategories");
+				categories.forEach(category => {
+					rows.append(categoryRow(category));
+				});
+			}
+		})();
+
+		function purchaseRow(purchase) {
+
+			const tr = document.createElement("tr");
+
+			const idTd = document.createElement("td");
+			idTd.append(purchase.id);
+			tr.append(idTd);
+
+			const dateTd = document.createElement("td");
+			dateTd.append(formatDate(purchase.date));
+			tr.append(dateTd);
+
+			const sumTd = document.createElement("td");
+			sumTd.append(purchase.sum);
+			tr.append(sumTd);
+
+			const clientTd = document.createElement("td");
+			clientTd.append(purchase.client.firstName + ' ' + purchase.client.lastName);
+			tr.append(clientTd);
+
+			return tr;
+		}
+
+		function clientRow(client) {
+
+			const tr = document.createElement("tr");
+
+			const idTd = document.createElement("td");
+			idTd.append(client.id);
+			tr.append(idTd);
+
+			const firstNameTd = document.createElement("td");
+			firstNameTd.append(client.firstName);
+			tr.append(firstNameTd);
+
+			const lastNameTd = document.createElement("td");
+			lastNameTd.append(client.lastName);
+			tr.append(lastNameTd);
+
+			const birthdayDateTd = document.createElement("td");
+			birthdayDateTd.append(formatDate(client.birthday));
+			tr.append(birthdayDateTd);
+
+			const registerDateTd = document.createElement("td");
+			registerDateTd.append(formatDate(client.signUpDate));
+			tr.append(registerDateTd);
+
+			const lastPurchaseDateTd = document.createElement("td");
+			lastPurchaseDateTd.append(formatDate(client.lastPurchaseDate));
+			tr.append(lastPurchaseDateTd);
+
+			return tr;
+		}
+
+		function birthdayRow(birthday) {
+
+			const tr = document.createElement("tr");
+
+			const idTd = document.createElement("td");
+			idTd.append(birthday.id);
+			tr.append(idTd);
+
+			const firstNameTd = document.createElement("td");
+			firstNameTd.append(birthday.firstName);
+			tr.append(firstNameTd);
+
+			const lastNameTd = document.createElement("td");
+			lastNameTd.append(birthday.lastName);
+			tr.append(lastNameTd);
+
+			return tr;
+		}
+
+		function lastClientRow(lastClient) {
+
+			const tr = document.createElement("tr");
+
+			const idTd = document.createElement("td");
+			idTd.append(lastClient.id);
+			tr.append(idTd);
+
+			const firstNameTd = document.createElement("td");
+			firstNameTd.append(lastClient.firstName);
+			tr.append(firstNameTd);
+
+			const lastNameTd = document.createElement("td");
+			lastNameTd.append(lastClient.lastName);
+			tr.append(lastNameTd);
+
+			const lastPurchaseDateTd = document.createElement("td");
+			lastPurchaseDateTd.append(formatDate(lastClient.lastPurchaseDate));
+			tr.append(lastPurchaseDateTd);
+
+			return tr;
+		}
+
+		function categoryRow(category) {
+
+			const tr = document.createElement("tr");
+
+			const nameTd = document.createElement("td");
+			nameTd.append(category.name);
+			tr.append(nameTd);
+
+			const countTd = document.createElement("td");
+			countTd.append(category.count);
+			tr.append(countTd);
+
+			return tr;
+		}
+
+		function formatDate(dateStr) {
+			var date = new Date(Date.parse(dateStr));
+			var dd = date.getDate();
+			if (dd < 10) dd = '0' + dd;
+
+			var mm = date.getMonth() + 1;
+			if (mm < 10) mm = '0' + mm;
+
+			var yyyy = date.getFullYear();
+
+			return mm + '-' + dd + '-' + yyyy;
+		}
+
+		function test() {
+			location.href = "/Clients";
+		}
+	</script>
+</body>
+</html>
